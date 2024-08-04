@@ -387,6 +387,14 @@ namespace {
     const int max_temp = 1500;
 };
 
+ConfigOption *disable_defaultoption(ConfigOption *option) {
+    return option->set_can_be_disabled()->set_enabled(false);
+}
+
+ConfigOptionVectorBase *disable_defaultoption(ConfigOptionVectorBase *option) {
+    return (ConfigOptionVectorBase *)option->set_can_be_disabled()->set_enabled(false);
+}
+
 PrintConfigDef::PrintConfigDef()
 {
     this->init_common_params();
@@ -824,8 +832,6 @@ void PrintConfigDef::init_fff_params()
         { "height", L("Layer height") },
         { "flow", L("Keep current flow") },
     });
-    def->min = -1;
-    def->max = 100;
     def->mode = comAdvancedE | comSuSi;
     def->set_default_value(new ConfigOptionEnum<BridgeType>{ BridgeType::btFromNozzle });
 
@@ -1362,7 +1368,7 @@ void PrintConfigDef::init_fff_params()
     def->max                = 100;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
     def->aliases = { "min_fan_speed" }; // only if "fan_always_on"
 
     def = this->add("default_print_profile", coString);
@@ -1660,7 +1666,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvancedE | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("external_perimeter_overlap", coPercent);
     def->label = L("external perimeter overlap");
@@ -2904,7 +2910,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("gap_fill_flow_match_perimeter", coPercent);
     def->label = L("Cap with perimeter flow");
@@ -3338,7 +3344,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("infill_first", coBool);
     def->label = L("Infill before perimeters");
@@ -3436,7 +3442,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvancedE | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
     def->aliases = { "bridge_internal_fan_speed" };
 
     def = this->add("internal_bridge_speed", coFloatOrPercent);
@@ -4144,7 +4150,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvancedE | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("overhangs_max_slope", coFloatOrPercent);
     def->label = L("Overhangs max slope");
@@ -4164,23 +4170,25 @@ void PrintConfigDef::init_fff_params()
     def->label = L("Bridge max length");
     def->category = OptionCategory::slicing;
     def->tooltip = L("Maximum distance for bridges. If the distance is over that, it will be considered as overhangs for 'overhangs_max_slope'."
-                    "\nSet to -1 to accept all distances."
+                    "\nIf disabled, accept all distances."
                     "\nSet to 0 to ignore bridges.");
     def->sidetext = L("mm");
-    def->min = -1;
+    def->min = 0;
+    def->can_be_disabled = true;
     def->mode = comExpert | comSuSi;
-    def->set_default_value(new ConfigOptionFloat(-1));
+    def->set_default_value(disable_defaultoption(new ConfigOptionFloat(0)));
 
     def = this->add("overhangs_bridge_upper_layers", coInt);
     def->label = L("Consider upper bridges");
     def->category = OptionCategory::slicing;
     def->tooltip = L("Don't put overhangs if the area will filled in next layer by bridges."
-                    "\nSet to -1 to accept all upper layers."
+                    "\nIf disabled, accept all upper layers."
                     "\nSet to 0 to only consider our layer bridges.");
     def->sidetext = L("layers");
-    def->min = -1;
+    def->min = 0;
+    def->can_be_disabled = true;
     def->mode = comExpert | comSuSi;
-    def->set_default_value(new ConfigOptionInt(0));
+    def->set_default_value(new ConfigOptionInt(2));
 
     def = this->add("overhangs_speed", coFloatOrPercent);
     def->label = L("Overhangs");
@@ -4409,7 +4417,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("perimeter_loop", coBool);
     def->label = L("Perimeters loop");
@@ -4499,15 +4507,16 @@ void PrintConfigDef::init_fff_params()
     def->category = OptionCategory::perimeter;
     def->tooltip = L("This option sets the number of perimeters to have over holes."
                    " Note that if a hole-perimeter fuse with the contour, then it will go around like a contour perimeter.."
-                   "\nSet to -1 to deactivate, then holes will have the same number of perimeters as contour."
+                   "\nIf disabled, holes will have the same number of perimeters as contour."
                    "\nNote that Slic3r may increase this number automatically when it detects "
                    "sloping surfaces which benefit from a higher number of perimeters "
                    "if the Extra Perimeters option is enabled.");
     def->sidetext = L("(minimum).");
-    def->min = -1;
+    def->min = 0;
     def->max = 10000;
+    def->can_be_disabled = true;
     def->mode = comAdvancedE | comSuSi;
-    def->set_default_value(new ConfigOptionInt(-1));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInt(0)));
 
     def = this->add("post_process", coStrings);
     def->label = L("Post-processing scripts");
@@ -5399,7 +5408,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("solid_infill_speed", coFloatOrPercent);
     def->label = L("Solid");
@@ -5777,7 +5786,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("support_material_interface_angle", coFloat);
     def->label = L("Pattern angle");
@@ -5813,7 +5822,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvancedE | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
 
     def = this->add("support_material_interface_contact_loops", coBool);
@@ -5850,20 +5859,20 @@ void PrintConfigDef::init_fff_params()
     def = this->add("support_material_bottom_interface_layers", coInt);
     def->label = L("Bottom interface layers");
     def->category = OptionCategory::support;
-    def->tooltip = L("Number of interface layers to insert between the object(s) and support material. "
-        "Set to -1 to use support_material_interface_layers");
+    def->tooltip = L("Number of interface layers to insert between the object(s) and support material."
+        "\nIf disabled, support_material_interface_layers value is used");
     def->sidetext = L("layers");
-    def->min = -1;
+    def->min = 0;
+    def->can_be_disabled = true;
     def->set_enum_values(ConfigOptionDef::GUIType::i_enum_open, {
     //TRN Print Settings: "Bottom interface layers". Have to be as short as possible
-        { "-1", L("Same as top") },
         { "0", L("0 (off)") },
         { "1", L("1 (light)") },
         { "2", L("2 (default)") },
         { "3", L("3 (heavy)") }
     });
     def->mode = comAdvancedE | comPrusa;
-    def->set_default_value(new ConfigOptionInt(-1));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInt(0)));
 
     def = this->add("support_material_closing_radius", coFloat);
     def->label = L("Closing radius");
@@ -6360,7 +6369,7 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvancedE | comSuSi;
     def->is_vector_extruder = true;
     def->can_be_disabled = true;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts({ 100 }))->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts({ 100 })));
 
     def = this->add("top_infill_extrusion_width", coFloatOrPercent);
     def->label = L("Top solid infill");
@@ -7680,7 +7689,7 @@ void PrintConfigDef::init_sla_params()
     def->max = max_temp;
     def->can_be_disabled = true;
     def->mode = comSimpleAE | comPrusa;
-    def->set_default_value((ConfigOptionInts*)(new ConfigOptionInts{30})->set_can_be_disabled()->set_enabled(false));
+    def->set_default_value(disable_defaultoption(new ConfigOptionInts{30}));
 
     def = this->add("bottle_volume", coFloat);
     def->label = L("Bottle volume");
@@ -8405,6 +8414,13 @@ void PrintConfigDef::handle_legacy(t_config_option_key &opt_key, std::string &va
                 value = "0";
             }
         }
+    }
+
+    if (value == "-1") {
+        if ("overhangs_bridge_threshold" == opt_key) {value = "!0";}
+        if ("overhangs_bridge_upper_layers" == opt_key) {value = "!2";}
+        if ("perimeters_hole" == opt_key) {value = "!0";}
+        if ("support_material_bottom_interface_layers" == opt_key) {value = "!0";}
     }
 
     if (!print_config_def.has(opt_key)) {
