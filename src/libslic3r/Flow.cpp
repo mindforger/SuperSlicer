@@ -307,7 +307,7 @@ Flow Flow::new_from_config(FlowRole role, const DynamicConfig& print_config, flo
     } else if (role == frTopSolidInfill) {
         config_width = print_config.opt<ConfigOptionFloatOrPercent>("top_infill_extrusion_width");
         config_spacing = print_config.opt<ConfigOptionFloatOrPercent>("top_infill_extrusion_spacing");
-        overlap = (float)print_config.get_abs_value("solid_infill_overlap", 1.);
+        overlap = (float)print_config.get_abs_value("top_infill_overlap", 1.);
     } else {
         throw Slic3r::InvalidArgument("Unknown role");
     }

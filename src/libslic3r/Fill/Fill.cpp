@@ -938,7 +938,7 @@ void Layer::make_ironing()
         double extrusion_height = ironing_params.height * fill.get_spacing() / nozzle_dmr;
         //FIXME FLOW decide if it's good
         double max_overlap = region_config.get_computed_value("filament_max_overlap", ironing_params.extruder - 1);
-        double overlap = std::min(max_overlap, region_config.solid_infill_overlap.get_abs_value(1.));
+        double overlap = region_config.top_infill_overlap.get_abs_value(1.);
         float  extrusion_width = Flow::rounded_rectangle_extrusion_width_from_spacing(float(nozzle_dmr), float(extrusion_height), float(overlap));
         double flow_mm3_per_mm = nozzle_dmr * extrusion_height;
         //Flow flow = Flow::new_from_spacing(float(nozzle_dmr), 0., float(height), 1.f, false);

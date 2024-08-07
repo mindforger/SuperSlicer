@@ -446,6 +446,7 @@ group:Overlap
 		setting:label_width$7:label$Gap Fill:gap_fill_overlap
 	end_line
 	setting:width$4:solid_infill_overlap
+	setting:width$4:top_infill_overlap
 	line:Bridge lines density
 		setting:label_width$7:bridge_overlap_min
 		setting:label_width$7:bridge_overlap

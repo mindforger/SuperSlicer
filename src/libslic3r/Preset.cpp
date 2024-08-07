@@ -659,6 +659,7 @@ static std::vector<std::string> s_Preset_print_options {
         "bridge_flow_ratio",
         "bridge_type",
         "solid_infill_overlap",
+        "top_infill_overlap",
         "infill_anchor",
         "infill_anchor_max",
         "clip_multipart_objects",
